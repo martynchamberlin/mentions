@@ -55,14 +55,12 @@ jQuery(document).ready(function($)
 	{
 		var output = "";
 
-		var start = pos;
+		var start = end = pos;
 
 		while ( start > 0 && ! isWhiteSpace(value[start - 1]) && ! isWhiteSpace(value[start]))
 		{
 			start--;
 		}
-
-		var end = start;
 
 		while ( end < (value.length -1) && !isWhiteSpace(value[end + 1]))
 		{
@@ -80,28 +78,6 @@ jQuery(document).ready(function($)
 			$('#output').append(" " + output);
 		}
 
-/*
-
-		var key = value[pos];
-
-		/* beginning of mention must be either white space or beginning 
-		 * of textarea
-		 *
-		if (pos === 0 && value[0] == '@' || pos < 0 && isWhiteSpace(value[i - 1]))
-		{
-			// Next, find length of this potential mention
-			var i = pos;
-			if ( i === 0 || isWhiteSpace(value[i - 1]) )
-			{
-				while (i < value.length && ! isWhiteSpace(value[i]))
-				{
-					mention += value[i];
-					i++;
-				}
-				alert(mention);
-
-			}
-		}*/
 		if (true)
 		{
 			return true;
@@ -116,11 +92,38 @@ jQuery(document).ready(function($)
 <body>
 
 <style>
+#wrap {
+	width: 714px;
+	margin: 0 auto;
+}
+
 textarea {
 	width: 300px;
 	height: 200px;
+	margin: 40px auto;
+	resize: none;
+overflow: auto;
+font: 18px/25px "Times New Roman";
+width: 714px;
+height: 70px;
+border: 1px solid #CCC;
+border-radius: 3px;
+-webkit-border-radius: 3px;
+-webkit-border-radius: 3px;
+padding: 6px;
+-webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+-moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+-ms-transition: border linear 0.2s, box-shadow linear 0.2s;
+-o-transition: border linear 0.2s, box-shadow linear 0.2s;
+transition: border linear 0.2s, box-shadow linear 0.2s;
+-webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+-moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+outline: none;
 }
 </style>
-<textarea id="myTextBoxSelector"></textarea>
+<div id="wrap">
+<textarea id="myTextBoxSelector" placeholder="Speak your mind ..."></textarea>
 <div id="output"></div>
+</div>
 </body>
