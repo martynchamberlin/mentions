@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US" xml:lang="en-US">
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Simple Hover Effect</title>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	
+<script type="text/javascript" >
+	/* This function complements of
+	 * http://stackoverflow.com/questions/1064089/inserting-a-text-where-cursor-is-using-javascript-jquery
+	 */
+
+(function ($, undefined) {
+    $.fn.getCursorPosition = function() {
+        var el = $(this).get(0);
+        var pos = 0;
+        if('selectionStart' in el) {
+            pos = el.selectionStart;
+        } else if('selection' in document) {
+            el.focus();
+            var Sel = document.selection.createRange();
+            var SelLength = document.selection.createRange().text.length;
+            Sel.moveStart('character', -el.value.length);
+            pos = Sel.text.length - SelLength;
+        }
+        return pos;
+    }
+})(jQuery);
+
+jQuery(document).ready(function($)
+{
+	$('textarea').bind('keyup', function(e) 
+	{
+		var value = $(this).val();
+
+		/* The reason we subtract 1 below is because the keyup event only
+		 * fires after the user has completed the stroke. We need to figure
+		 * out what they just typed. This is actually the best way to do it
+		 */
+		var pos = parseInt($(this).getCursorPosition() -1);
+
+		if (isValidMention(value, pos))
+		{
+			// Do some Ajax
+		}
+	});
+
+	function isWhiteSpace(space)
+	{
+		return (space === " " || space == "\n" || space == "\t");
+	}
+
+	function isValidMention(value, pos)
+	{
+		var output = "";
+
+		var start = pos;
+
+		while ( start > 0 && ! isWhiteSpace(value[start - 1]) && ! isWhiteSpace(value[start]))
+		{
+			start--;
+		}
+
+		var end = start;
+
+		while ( end < (value.length -1) && !isWhiteSpace(value[end + 1]))
+		{
+			end++;
+		}
+
+		$('#output').html(start + " " + end);
+
+		if (end - start >= 1 && value[start] == '@')
+		{
+			for (var i = start; i <= end; i++)
+			{
+				output += value[i];
+			}
+			$('#output').append(" " + output);
+		}
+
+/*
+
+		var key = value[pos];
+
+		/* beginning of mention must be either white space or beginning 
+		 * of textarea
+		 *
+		if (pos === 0 && value[0] == '@' || pos < 0 && isWhiteSpace(value[i - 1]))
+		{
+			// Next, find length of this potential mention
+			var i = pos;
+			if ( i === 0 || isWhiteSpace(value[i - 1]) )
+			{
+				while (i < value.length && ! isWhiteSpace(value[i]))
+				{
+					mention += value[i];
+					i++;
+				}
+				alert(mention);
+
+			}
+		}*/
+		if (true)
+		{
+			return true;
+		}
+		return false;
+	}
+});
+
+
+</script>
+</head>
+<body>
+
+<style>
+textarea {
+	width: 300px;
+	height: 200px;
+}
+</style>
+<textarea id="myTextBoxSelector"></textarea>
+<div id="output"></div>
+</body>
