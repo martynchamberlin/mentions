@@ -22,6 +22,7 @@
 jQuery(document).ready(function($)
 {
 	$('textarea').autosize();
+
 	$('textarea').bind('keyup', function(e) 
 	{
 		var value = $(this).val();
@@ -29,8 +30,15 @@ jQuery(document).ready(function($)
 
 		if (isValidMention(value, pos))
 		{
+			showDropdown();
+
 			// Do some Ajax
 		}
+		else
+		{
+			hideDropdown();
+		}
+
 	});
 
 	function isWhiteSpace(space)
@@ -54,7 +62,7 @@ jQuery(document).ready(function($)
 			end++;
 		}
 
-		$('#output').html(start + " " + end);
+		//$('#output').html(start + " " + end);
 
 		if (end - start >= 1 && value[start] == '@')
 		{
@@ -62,12 +70,8 @@ jQuery(document).ready(function($)
 			{
 				output += value[i];
 			}
-			$('#output').append(" " + output);
-		}
-
-		if (true)
-		{
 			return true;
+			//$('#output').append(" " + output);
 		}
 		return false;
 	}
@@ -77,9 +81,14 @@ jQuery(document).ready(function($)
 		$('#dropdown').show();
 		var top = $('textarea').outerHeight() + $('textarea').offset().top;
 		var width = $('textarea').outerWidth();
-		var ul = '<ul><li><input type="hidden" value="@martynchamberlin">Martyn Chamberlin @martynchamberlin</li><li><input type="hidden" value="@markmedian"> Mark Median @markmedian</li><li><input type="hidden" value="@Mitchel"> Mark Median @markmedian</li></ul>';
+		var ul = '<ul><li><input type="hidden" value="@martynchamberlin">Martyn Chamberlin <span class="handle">@martynchamberlin</span></li><li><input type="hidden" value="@markmedian"> Mark Median <span class="handle">@markmedian</span></li><li><input type="hidden" value="@Mitchel"> Mark Median <span class="handle">@markmedian</span></li></ul>';
 		$('#dropdown').html(ul).css('width', width -2);
 		makeDropdownPretty();
+	}
+
+	function hideDropdown()
+	{
+		$('#dropdown').hide();
 	}
 
 	function makeDropdownPretty()
@@ -88,7 +97,13 @@ jQuery(document).ready(function($)
 		$('#dropdown li').last().addClass('last');
 	}
 
-	showDropdown();
+	
+	$('#dropdown li').click(function()
+	{
+		var handle = $(this).find('input').val();
+		alert(handle);
+	});
+
 });
 
 
