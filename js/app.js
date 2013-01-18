@@ -27,10 +27,34 @@ jQuery(document).ready(function($)
 	 * like hardcoding DOM elements (`textarea` and `dropdown`) because your 
 	 * choice of ideal HTML IDs might be totally different from mine.
 	 */
-	var start;
-	var end;
+	var mention = {
+		showing: false,
+		start: 0,
+		end: 0,
+		handle: "",
+		options: ""
+	};
+
 	var textarea = $('textarea');
 	var dropdown = $('#dropdown');
+
+	var usable = new Array();
+	var i;
+	// A - Z
+	for (i = 65; i <= 90; i++)
+	{
+		usable[usable.length] = String.fromCharCode(i);
+	}
+	// a - z
+	for (i = 97; i <= 122; i++)
+	{
+		usable[usable.length] = String.fromCharCode(i);
+	}
+	// 0 - 9
+	for (i = 0; i <= 9; i++)
+	{
+		usable[usable.length] = i;
+	}
 
 	// This external plugin isn't necessary, I just love using it everywhere
 	$(textarea).autosize();
@@ -43,35 +67,70 @@ jQuery(document).ready(function($)
 		val = $(textarea).val();
 		for (var i = 0; i < val.length; i++)
 		{
-			if ( i == start )
+			if ( i == mention.start )
 			{
 				output += handle;
-				i = end;
+				i = mention.end;
 				continue;
 			}
 			output += val[i];
 		}
-		//var i = start;
-		//alert(val);
-		//for (end - start; 
-		//val.splice(start, end - start, handle);
 		updateTextarea(output);
 		hideDropdown();
-		//alert(handle);
-
 	});
 
 	$(textarea).bind('keyup', function(e) 
 	{
+		/* As soon as they type '@', we're doing a DB query on every keystroke.
+		 * This could potentially mean that a viable return set is no longer in
+		 * existence, meaning the dropdown menu no longer shows. If such is the
+		 * case, we want this bool property to be false.
+		 */
+		mention.showing = false;
+
+		var evnt = window.event ? window.event : e;
+		evnt = evnt.keyCode;
+		if (evnt == 13) // hitting enter
+		{
+			
+		}
+		//alert(evnt);
 		var value = $(this).val();
 		var pos = parseInt($(this).getCursorPosition());
 
 		if (isValidMention(value, pos))
 		{
-			showDropdown();
-
 			// Do some Ajax
+			var ajax = $.ajax({
+				url: "ajax.php",
+				type: "POST",
+				data: { handle : mention.handle.substring(1, mention.handle.length)},
+				dataType: 'json',
+				success: function( data )
+				{
+					var output = "<ul>";
+					for (var i = 0; i < data.length; i++)
+					{
+						output += "<li>" + data[i][0] + " " + data[i][1] + " "
+						+ "<span class=\"handle\">@"
+						+ data[i][2] + "</span><input type=\"hidden\" value=\"@"
+						+ data[i][2] + "\"></li>";
+					}
+					if (data.length > 0)
+					{
+						mention.showing = true;
+						mention.options = output;
+						showDropdown(mention.options);
+					}
+					// We made a DB query, but nothing was returned
+					else
+					{
+						hideDropdown();
+					}
+				}
+			});
 		}
+		// 99% of the time, this will be the code that executes.
 		else
 		{
 			hideDropdown();
@@ -84,54 +143,66 @@ jQuery(document).ready(function($)
 		return (space === " " || space == "\n" || space == "\t");
 	}
 
+	function isNumberOrLetter(space)
+	{
+		var good = false;
+
+		for (var i = 0; i < usable.length; i++)
+		{
+			if (usable[i] == space && ! isWhiteSpace(space))
+			{
+				good = true;
+			}
+
+		}
+		return good;
+	}
+
+
 	function isValidMention(value, pos)
 	{
 		var output = "";
 
-		start = end = pos - 1;
+		mention.start = mention.end = pos - 1;
 
-		while ( start > 0 && ! isWhiteSpace(value[start - 1]) && ! isWhiteSpace(value[start]))
+		while ( mention.start > 0 && isNumberOrLetter(value[mention.start]))
 		{
-			start--;
+			mention.start--;
+		}
+		while ( mention.end < (value.length -1) && isNumberOrLetter(value[mention.end + 1]))
+		{
+			mention.end++;
 		}
 
-		while ( end < (value.length -1) && !isWhiteSpace(value[end + 1]))
+		if (mention.end - mention.start >= 1 && value[mention.start] == '@')
 		{
-			end++;
-		}
-
-		//$('#output').html(start + " " + end);
-
-		if (end - start >= 1 && value[start] == '@')
-		{
-			for (var i = start; i <= end; i++)
+			for (var i = mention.start; i <= mention.end; i++)
 			{
 				output += value[i];
 			}
+			mention.handle = output;
 			return true;
-			//$('#output').append(" " + output);
 		}
 		return false;
 	}
 	
 	function updateTextarea(val)
 	{
-		$(textarea).val(val);
+		var val = $(textarea).val(val);
 	}
 
-	function showDropdown()
+	function showDropdown(data)
 	{
 		$(dropdown).show();
 		var top = $(textarea).outerHeight() + $(textarea).offset().top;
 		var width = $(textarea).outerWidth();
-		var ul = '<ul><li><input type="hidden" value="@martynchamberlin">Martyn Chamberlin <span class="handle">@martynchamberlin</span></li><li><input type="hidden" value="@markmedian"> Mark Median <span class="handle">@markmedian</span></li><li><input type="hidden" value="@Mitchel"> Mark Median <span class="handle">@markmedian</span></li></ul>';
-		$(dropdown).html(ul).css('width', width -2);
+		$(dropdown).html(data).css('width', width -2);
 		makeDropdownPretty();
 	}
 
 	function hideDropdown()
 	{
-		$(dropdown).hide();
+		$(dropdown).html('').hide();
 	}
 
 	function makeDropdownPretty()
@@ -139,7 +210,6 @@ jQuery(document).ready(function($)
 		$(dropdown).find('li').first().addClass('first');
 		$(dropdown).find('li').last().addClass('last');
 	}
-
 
 });
 
