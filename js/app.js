@@ -59,42 +59,43 @@ jQuery(document).ready(function($)
 	// This external plugin isn't necessary, I just love using it everywhere
 	$(textarea).autosize();
 
-	// All DOM events are shown here, followed by my custom functions.
+	/* All DOM events are shown here, followed by my custom functions.
+	 *
+	 * Starting with this function, the assumption is that the selected 
+	 * `<li>` is based on a class on that persons's `<li>` element. It's not
+	 * necessary for a simple click event, but it's paramount for arrowing
+	 * functionality.
+	 */
 	$(dropdown).find('li').live("click", function()
 	{
-		var handle = $(this).find('input').val();
-		var output = "";
-		val = $(textarea).val();
-		for (var i = 0; i < val.length; i++)
-		{
-			if ( i == mention.start )
-			{
-				output += handle;
-				i = mention.end;
-				continue;
-			}
-			output += val[i];
-		}
-		updateTextarea(output);
-		hideDropdown();
+		$(this).addClass('selected');
+		updateTextarea();
 	});
 
-	$(textarea).bind('keyup', function(e) 
+	$(textarea).bind('keyup', function(event) 
 	{
 		/* As soon as they type '@', we're doing a DB query on every keystroke.
 		 * This could potentially mean that a viable return set is no longer in
 		 * existence, meaning the dropdown menu no longer shows. If such is the
 		 * case, we want this bool property to be false.
 		 */
+
+		var evnt = window.event ? window.event : event;
+		evnt = evnt.keyCode;
+		if (evnt == 13 && mention.showing) // hitting enter
+		{
+			updateTextarea();
+		
+		}
+		else if (evnt == 40 || evnt == 38 && mention.showing)
+		{
+			arrow(evnt);
+			event.preventDefault();
+			return;
+		}
+
 		mention.showing = false;
 
-		var evnt = window.event ? window.event : e;
-		evnt = evnt.keyCode;
-		if (evnt == 13) // hitting enter
-		{
-			
-		}
-		//alert(evnt);
 		var value = $(this).val();
 		var pos = parseInt($(this).getCursorPosition());
 
@@ -137,6 +138,17 @@ jQuery(document).ready(function($)
 		}
 
 	});
+
+	function arrow(direction)
+	{
+		if (direction == 40) // going down
+		{
+			if ($('li.selected').length < 1)
+			{
+				$(dropdown).find('li').first().addClass('selected');
+			}
+		}
+	}
 
 	function isWhiteSpace(space)
 	{
@@ -186,9 +198,24 @@ jQuery(document).ready(function($)
 		return false;
 	}
 	
-	function updateTextarea(val)
+	function updateTextarea()
 	{
-		var val = $(textarea).val(val);
+		var handle = $(dropdown).find('li.selected').find('input').val();
+		var output = "";
+		val = $(textarea).val();
+		for (var i = 0; i < val.length; i++)
+		{
+			if ( i == mention.start )
+			{
+				output += handle;
+				i = mention.end;
+				continue;
+			}
+			output += val[i];
+		}
+
+		$(textarea).val(output);
+		hideDropdown();
 	}
 
 	function showDropdown(data)
@@ -197,6 +224,7 @@ jQuery(document).ready(function($)
 		var top = $(textarea).outerHeight() + $(textarea).offset().top;
 		var width = $(textarea).outerWidth();
 		$(dropdown).html(data).css('width', width -2);
+		//$(dropdown).find('li').first().addClass('selected');
 		makeDropdownPretty();
 	}
 
