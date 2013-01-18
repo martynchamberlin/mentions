@@ -76,11 +76,22 @@ jQuery(document).ready(function($)
 	{
 		var evnt = window.event ? window.event : event;
 		evnt = evnt.keyCode;
-		if (evnt == 40 || evnt == 38) // hitting enter
+		if (evnt == 13)
 		{
-			event.preventDefault();
-			return false;
+			updateTextarea();
+					event.preventDefault();
+		return false;
+
 		}
+		
+		else if (evnt == 37 || evnt == 38 || evnt == 39 || evnt == 40) // hitting enter
+		{
+		event.preventDefault();
+		return false;
+
+		}
+
+
 	});
 
 	$(textarea).bind('keyup', function(event) 
@@ -96,19 +107,19 @@ jQuery(document).ready(function($)
 		if (evnt == 13 && mention.showing) // hitting enter
 		{
 			//updateTextarea();
+			return;
 		
 		}
 		else if (evnt == 40 || evnt == 38 && mention.showing)
 		{
 		
-			//arrow(evnt);
-						event.preventDefault();
-			return false;
+			arrow(evnt);
+			return;
 
 		}
 		$('#output').html(evnt);
 
-		mention.showing = false;
+		//mention.showing = false;
 
 		var value = $(this).val();
 		var pos = parseInt($(this).getCursorPosition());
