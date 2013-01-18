@@ -50,12 +50,11 @@ p {
 	font-weight: normal;
 }
 
-#dropdown li:hover, #dropdown li:hover .handle {
+#dropdown li:hover, #dropdown li:hover .handle, #dropdown li.selected, #dropdown li.selected .handle {
 	background: #3875d7;
 	cursor: pointer;
 	color: #fff;
 }
-
 
 textarea {
 	resize: none;

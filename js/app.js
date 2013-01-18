@@ -167,10 +167,22 @@ jQuery(document).ready(function($)
 	{
 		if (direction == 40) // going down
 		{
-			if ($('li.selected').length < 1)
+			if ($(dropdown).find('li.selected').length < 1)
 			{
 				$(dropdown).find('li').first().addClass('selected');
 			}
+			else if ($(dropdown).find('li.selected').next().length > 0)
+			{
+				$(dropdown).find('li.selected').removeClass('selected').next().addClass('selected');
+			}
+		}
+		else if (direction == 38) // going up
+		{
+			if ( $(dropdown).find('li.selected').length > 0 
+				&& $(dropdown).find('li.selected').prev().length > 0 )
+				{
+					$(dropdown).find('li.selected').removeClass('selected').prev().addClass('selected');
+				}
 		}
 	}
 
