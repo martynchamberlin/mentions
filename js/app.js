@@ -29,6 +29,7 @@ jQuery(document).ready(function($)
 	 */
 	var mention = {
 		showing: false,
+		justClosed: false,
 		start: 0,
 		end: 0,
 		handle: "",
@@ -76,22 +77,19 @@ jQuery(document).ready(function($)
 	{
 		var evnt = window.event ? window.event : event;
 		evnt = evnt.keyCode;
-		if (evnt == 13)
+		if (evnt == 13 && mention.showing)
 		{
 			updateTextarea();
-					event.preventDefault();
-		return false;
+			event.preventDefault();
+			return false;
 
 		}
 		
-		else if (evnt == 37 || evnt == 38 || evnt == 39 || evnt == 40) // hitting enter
+		else if (evnt == 38 && mention.showing  || evnt == 40 && mention.showing)	
 		{
-		event.preventDefault();
-		return false;
-
+			event.preventDefault();
+			return false;
 		}
-
-
 	});
 
 	$(textarea).bind('keyup', function(event) 
@@ -117,14 +115,14 @@ jQuery(document).ready(function($)
 			return;
 
 		}
-		$('#output').html(evnt);
+		$('#output').html(mention.showing);
 
 		//mention.showing = false;
 
 		var value = $(this).val();
 		var pos = parseInt($(this).getCursorPosition());
 
-		if (isValidMention(value, pos))
+		if (isValidMention(value, pos) && !mention.justClosed)
 		{
 			// Do some Ajax
 			var ajax = $.ajax({
@@ -160,6 +158,7 @@ jQuery(document).ready(function($)
 		else
 		{
 			hideDropdown();
+			mention.justClosed = false;
 		}
 
 	});
@@ -226,24 +225,27 @@ jQuery(document).ready(function($)
 	function updateTextarea()
 	{
 		var handle = $(dropdown).find('li.selected').find('input').val();
-		var output = "";
-		val = $(textarea).val();
-		for (var i = 0; i < val.length; i++)
+		if (handle)
 		{
-			if ( i == mention.start )
+			var output = "";
+			val = $(textarea).val();
+			for (var i = 0; i < val.length; i++)
 			{
-				output += handle;
-				i = mention.end;
-				continue;
+				if ( i == mention.start )
+				{
+					output += handle;
+					i = mention.end;
+					continue;
+				}
+				output += val[i];
 			}
-			output += val[i];
-		}
 
-		if (val.lenth - 1 == mention.end)
-		{
-			output += "";
+			if (val.lenth - 1 == mention.end)
+			{
+				output += "";
+			}
+			$(textarea).val(output);
 		}
-		$(textarea).val(output);
 		hideDropdown();
 	}
 
@@ -260,6 +262,9 @@ jQuery(document).ready(function($)
 	function hideDropdown()
 	{
 		$(dropdown).html('').hide();
+		mention.showing = false;
+		mention.justClosed = true;
+		return;
 	}
 
 	function makeDropdownPretty()
