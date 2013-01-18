@@ -72,6 +72,17 @@ jQuery(document).ready(function($)
 		updateTextarea();
 	});
 
+	$(textarea).keydown(function(event)
+	{
+		var evnt = window.event ? window.event : event;
+		evnt = evnt.keyCode;
+		if (evnt == 40 || evnt == 38) // hitting enter
+		{
+			event.preventDefault();
+			return false;
+		}
+	});
+
 	$(textarea).bind('keyup', function(event) 
 	{
 		/* As soon as they type '@', we're doing a DB query on every keystroke.
@@ -84,15 +95,18 @@ jQuery(document).ready(function($)
 		evnt = evnt.keyCode;
 		if (evnt == 13 && mention.showing) // hitting enter
 		{
-			updateTextarea();
+			//updateTextarea();
 		
 		}
 		else if (evnt == 40 || evnt == 38 && mention.showing)
 		{
-			arrow(evnt);
-			event.preventDefault();
-			return;
+		
+			//arrow(evnt);
+						event.preventDefault();
+			return false;
+
 		}
+		$('#output').html(evnt);
 
 		mention.showing = false;
 
@@ -214,6 +228,10 @@ jQuery(document).ready(function($)
 			output += val[i];
 		}
 
+		if (val.lenth - 1 == mention.end)
+		{
+			output += "";
+		}
 		$(textarea).val(output);
 		hideDropdown();
 	}
