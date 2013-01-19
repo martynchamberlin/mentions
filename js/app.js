@@ -94,11 +94,6 @@ jQuery(document).ready(function($)
 
 	$(textarea).bind('keyup', function(event) 
 	{
-		/* As soon as they type '@', we're doing a DB query on every keystroke.
-		 * This could potentially mean that a viable return set is no longer in
-		 * existence, meaning the dropdown menu no longer shows. If such is the
-		 * case, we want this bool property to be false.
-		 */
 
 		var evnt = window.event ? window.event : event;
 		evnt = evnt.keyCode;
@@ -274,7 +269,21 @@ jQuery(document).ready(function($)
 	function hideDropdown()
 	{
 		$(dropdown).html('').hide();
+		/* As soon as they type '@', we're doing a DB query on every keystroke.
+		 * This could potentially mean that a viable return set is no longer in
+		 * existence, meaning the dropdown menu no longer shows. If such is the
+		 * case, we want this bool property to be false.
+		 */
 		mention.showing = false;
+		/* You'd have to really study this application to understand why this 
+		 * next bool is necessary. Basically, if we don't do it, a DB query 
+		 * happens immediately after hitting the Enter key on a selected 
+		 * username. The more elegant solution would be to focus the cursor 
+		 * exactly one character after the username, adding a white space if that
+		 * character doesn't exist (this is how Twitter does it). However,
+		 * focusing the cursor in the middle of a  textarea requires some 
+		 * extremely confusing code that I can't jiggle into cooperation. 
+		 */
 		mention.justClosed = true;
 		return;
 	}
