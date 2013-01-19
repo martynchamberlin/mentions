@@ -77,7 +77,7 @@ jQuery(document).ready(function($)
 	{
 		var evnt = window.event ? window.event : event;
 		evnt = evnt.keyCode;
-		if (evnt == 13 && mention.showing)
+		if (evnt == 13 && mention.showing || evnt == 9 && mention.showing)
 		{
 			updateTextarea();
 			event.preventDefault();
@@ -110,7 +110,6 @@ jQuery(document).ready(function($)
 			return;
 
 		}
-		$('#output').html(mention.showing);
 
 		//mention.showing = false;
 
@@ -281,7 +280,7 @@ jQuery(document).ready(function($)
 		 * username. The more elegant solution would be to focus the cursor 
 		 * exactly one character after the username, adding a white space if that
 		 * character doesn't exist (this is how Twitter does it). However,
-		 * focusing the cursor in the middle of a  textarea requires some 
+		 * focusing the cursor in the middle of a textarea requires some 
 		 * extremely confusing code that I can't jiggle into cooperation. 
 		 */
 		mention.justClosed = true;

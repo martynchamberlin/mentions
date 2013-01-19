@@ -6,7 +6,7 @@
  * you'll need to fill out the placeholder values for your own database
  * credentials. You'll also want to change the `SELECT` statement so the
  * column names are named after your real columnn names. Note that I'm not 
- * the return set prioritizing using an `ORDER BY` clause. Twitter prioritizes
+ * organizing the return set using an `ORDER BY` clause. Twitter prioritizes
  * the return set by how often you've pinged other people already, which is
  * entering potentially complex logic best left up to your particular 
  * implementation. Good luck!
